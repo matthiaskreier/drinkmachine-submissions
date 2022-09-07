@@ -282,3 +282,4 @@ input.onButtonPressed(Button.B, function () {
 })
 
 
+serial.writeLine("Press A for a small coffee of sleepy strength and B for a Mr.Wolf sized cup of water chilled to 9 ˚C")
