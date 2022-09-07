@@ -1,3 +1,4 @@
+
 /*****************************************************/
 /*
 DO NOT EDIT CODE BETWEEN THIS LINE AND LINE 218. It will likely break the simulation!
@@ -221,65 +222,128 @@ function fillCup() {
 //END OF SIMULATOR CODE
 
 //Add your own code below.
-function makeSleepyCoffeeCup(volume: number) {
-    serial.writeLine("Now making Small sized Sleepy Coffee Cup")
-    serial.writeLine(myDrinkMachine.getVolume().toString())
-    serial.writeLine("Now Filling Container")
-    myDrinkMachine.startFillingContainer()
-    while (myDrinkMachine.getVolume() < volume) {
-        myDrinkMachine.wait(1)
-    }
-    serial.writeLine("Container Filled")
-    myDrinkMachine.stopFillingContainer()
-    serial.writeLine("Now adding Coffee Grounds")
-    while (myDrinkMachine.groundsInMixingContainer < 17) {
-        myDrinkMachine.addGrounds()
-    }
-    serial.writeLine("Coffee Grounds Added")
-    serial.writeLine("Now Heating Container")
-    myDrinkMachine.turnHeaterOn()
-    while (myDrinkMachine.getTemperature() < 93) {
-        myDrinkMachine.wait(1)
-    }
-    serial.writeLine("Heating Completed")
-    myDrinkMachine.turnHeaterOff()
-    serial.writeLine(myDrinkMachine.getTemperature().toString())
-    let filledCup = fillCup()
-    serial.writeLine(filledCup.descriptionString)
-    let concentration = filledCup.coffeeGrounds / filledCup.volume
-    serial.writeLine(concentration.toString())
-}
 
-function makeColdWaterCup(volume: number) {
-    serial.writeLine("Now making Mr. Wolf sized Cold Water Cup")
-    serial.writeLine(myDrinkMachine.getVolume().toString())
-    myDrinkMachine.startFillingContainer()
-    serial.writeLine("Now Filling Container")
-    while (myDrinkMachine.getVolume() < volume) {
-        myDrinkMachine.wait(1)
-    }
-    myDrinkMachine.stopFillingContainer()
-    serial.writeLine("Container Filled")
-    myDrinkMachine.turnCoolerOn()
-    serial.writeLine("Now Cooling Container")
-    while (myDrinkMachine.getTemperature() > 9.1) {
-        myDrinkMachine.wait(1)
-
-    }
-    myDrinkMachine.turnCoolerOff()
-    serial.writeLine("Cooling Completed")
-    serial.writeLine(myDrinkMachine.getTemperature().toString())
-    let filledCup = fillCup()
-    serial.writeLine(filledCup.descriptionString)
-}
 
 input.onButtonPressed(Button.A, function () {
-    makeSleepyCoffeeCup(200)
+    serial.writeLine("Making Drink")
+    start_coffee()
+
 })
 
 input.onButtonPressed(Button.B, function () {
-    makeColdWaterCup(500)
+    serial.writeLine("Making Drink")
+    start_soda()
+
 })
 
 
-serial.writeLine("Press A for a small coffee of sleepy strength and B for a Mr.Wolf sized cup of water chilled to 9 ˚C")
+
+function get_data(c: boolean) {
+    let filledCup = fillCup()
+    let concentration_coffee = filledCup.coffeeGrounds / filledCup.volume
+    let concentration_soda = filledCup.sodaMix / filledCup.volume
+    if (c == true) {
+        serial.writeLine(concentration_coffee.toString())
+    }
+    else {
+        serial.writeLine(concentration_soda.toString())
+    }
+    serial.writeLine(filledCup.descriptionString)
+}
+
+
+
+
+
+function start_coffee() {
+    fill_container(true)
+    is_concentration_coffee(true)
+    is_temp_coffee(true)
+    get_data(true)
+}
+
+
+
+
+function start_soda() {
+    fill_container(false)
+    is_concentration_coffee(false)
+    is_temp_coffee(false)
+
+    get_data(false)
+
+}
+
+
+
+
+
+
+function fill_container(c: boolean) {
+    let small = 200
+    let medium = 350
+    let mrwolf = 500
+    myDrinkMachine.startFillingContainer()
+    if (c == true) {
+        while (myDrinkMachine.getVolume() < mrwolf) {
+            myDrinkMachine.wait(1)
+        }
+    }
+    else {
+        while (myDrinkMachine.getVolume() < mrwolf) {
+            myDrinkMachine.wait(1)
+        }
+    }
+
+    myDrinkMachine.stopFillingContainer()
+}
+
+
+
+
+
+function is_concentration_coffee(c: boolean) {
+    let sleepy = 0.08
+    let normal = 0.06
+    let soda = 0.1
+    if (c == true) {
+        while (myDrinkMachine.getGrounds() / myDrinkMachine.getVolume() < sleepy) {
+            myDrinkMachine.addGrounds()
+        }
+    }
+    else {
+        while (myDrinkMachine.getSodaMix() / myDrinkMachine.getVolume() < 0) {
+            myDrinkMachine.addSodaMix()
+        }
+    }
+}
+
+
+
+
+
+
+
+
+function is_temp_coffee(c: boolean) {
+    let coffee_temp = 93
+    let soda_temp = 9
+    if (c == true) {
+        myDrinkMachine.turnHeaterOn()
+        while (myDrinkMachine.getTemperature() < coffee_temp) {
+            myDrinkMachine.wait(1)
+        }
+        myDrinkMachine.turnHeaterOff()
+    }
+    else {
+        myDrinkMachine.turnCoolerOn()
+        while (myDrinkMachine.getTemperature() > 4) {
+            myDrinkMachine.wait(1)
+        }
+        myDrinkMachine.turnCoolerOff()
+    }
+
+}
+
+serial.writeLine("Press A for a Mr. Wolf sized coffee of sleepy strength and B for a Mr. Wolf sized cup of water chilled to 4 ˚C")
+
